@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en" prefix="og: http://ogp.me/ns#"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title>在 Mac 中安装 CocoaPods · XWARTZ</title><meta name="description" content="在 Mac 中安装 CocoaPods - xwartz"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/blog/favicon.ico"><link rel="stylesheet" href="//at.alicdn.com/t/font_1472710214_6648843.css"><link rel="stylesheet" href="//raw.githack.com/xwartz/hexo-theme-nuna/next/source/style/main.css?v=1.0.3"></head><body class="pupa"><div class="loading-bar"></div><main><div class="post post"><article itemscope itemtype="http://schema.org/Article" class="hentry"><div itemprop="image" style="background-image: url(http://ww3.sinaimg.cn/large/65e4f1e6gw1f8s8okwbjzj20m80cigq0.jpg)" class="entry-cover"></div><div class="container"><div class="entry-header"><h1 class="entry-title">在 Mac 中安装 CocoaPods</h1><div class="entry-description"><p>CocoaPods 为 iOS 程序提供依赖管理的工具，类似 Node.js 的 npm 。</p></div><div class="entry-meta"><time itemprop="datePublished" datetime="Friday, October 14th 2016, 11:45:00 pm" class="updated">Oct 14, 2016</time><em class="post-count">870 words</em></div></div><div itemprop="articleBody" class="entry-content"><p>最近要开始搞 <a href="https://github.com/facebook/react-native">react-native</a>，安装 <a href="https://github.com/CocoaPods/CocoaPods">CocoaPods</a> 时，遇到点麻烦，所以记录一下。</p>
+<p>执行 <code>sudo gem install cocoapods</code> 命令时，报了如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ERROR: Error installing cocoapods: </div><div class="line">activesupport requires Ruby version &gt;= 2.2.2.</div></pre></td></tr></table></figure>
+<p>ruby 版本太低了，查看当前 <code>ruby -v</code> 版本： <code>ruby 2.0.0p648 (2015-12-16 revision 53162) [universal.x86_64-darwin15]</code>。</p>
+<h3 id="升级-ruby-版本"><a href="#升级-ruby-版本" class="headerlink" title="升级 ruby 版本"></a>升级 ruby 版本</h3><p>安装 rvm:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl -L get.rvm.io | bash -s stable</div><div class="line">source ~/.rvm/scripts/rvm</div></pre></td></tr></table></figure>
+<p>安装 ruby 版本:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">rvm list known</div><div class="line">rvm install ruby-2.3.0</div></pre></td></tr></table></figure>
+<p>继续报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Error running ‘requirements_osx_brew_update_system ruby-2.2.2’, </div><div class="line">showing last 15 lines of /Users/jolie/.rvm/log/1471244386_ruby-2.2.2/update_system.log </div><div class="line">https://github.com/Homebrew/homebrew/wiki/Common-Issues </div><div class="line">and make sure brew update works before continuing.’</div></pre></td></tr></table></figure>
+<p>ok，<code>homebrew</code> 需要升级，我先卸载了，反正会再次被安装的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)&quot;</div></pre></td></tr></table></figure>
+<p>使用 ruby 2.3.0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># 查看已安装版本</div><div class="line">rvm list</div><div class="line"># 删除已安装版本</div><div class="line">rvm remove 2.0.0</div><div class="line"># 设置默认版本</div><div class="line">rvm install ruby-2.3.0</div><div class="line">rvm use 2.3.0 --default</div></pre></td></tr></table></figure>
+<h3 id="安装-CocoaPods"><a href="#安装-CocoaPods" class="headerlink" title="安装 CocoaPods"></a>安装 CocoaPods</h3><p>为了加速安装速度，更换 gem 源。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># 查看源</div><div class="line">gem sources</div><div class="line"># 删除已有的源</div><div class="line">gem sources -r http://rubygems.org/</div><div class="line"># 更换为 ruby-china 的源</div><div class="line">gem sources -a https://gems.ruby-china.org/</div></pre></td></tr></table></figure>
+<p>安装 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo gem install cocoapods</div></pre></td></tr></table></figure>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="http://blog.devtang.com/2014/05/25/use-cocoapod-to-manage-ios-lib-dependency/">用CocoaPods做iOS程序的依赖管理</a><br><a href="http://blog.csdn.net/fairytale_1/article/details/51850734">关于安装cocoapods遇到的一些坑（ERROR: Error installing cocoapods: activesupport requires Ruby version &gt;= 2.2）</a><br><a href="http://www.jianshu.com/p/32d9cfb91471">iOS CocoaPods 安装笔记</a></p></div><div class="entry-extra"><div class="entry-tags"><a href="/blog/tags/code/" class="tag">code</a></div></div></div></article></div></main><footer><div class="copyright container"><p>© Copyright 2015 - 2018 by <a href="http://github.com/xwartz">xwartz</a>.</p></div></footer><script async src="//cdn.bootcss.com/mathjax/2.7.0-beta.0/MathJax.js"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-69822347-1",'auto');
+ga('set', 'appName',"XWARTZ");
+ga('send','pageview');</script><script>(function () { var sid =500303098;cid =500303108;var hm = document.createElement('script');
+hm.src = 'http://pingjs.qq.com/h5/stats.js';
+hm.setAttribute('name', 'MTAH5'); hm.setAttribute('sid', sid); hm.setAttribute('cid', cid);
+var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s);
+}())</script><script>var _vds = _vds || [];
+window._vds = _vds;
+(function(){
+  ;_vds.push(['setAccountId',"90b580e047dd0007"  ]);
+  (function() {
+      var vds = document.createElement('script');
+      vds.type='text/javascript';
+      vds.async = true;
+      vds.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'dn-growing.qbox.me/vds.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(vds, s);
+  })();
+})();</script><script async src="//raw.githack.com/Easyfood/pageAccelerator/master/dist/page-accelerator.min.js"></script><script async src="/blog/script/loading.js"></script><script async src="/blog/script/photo.js"></script></body></html>

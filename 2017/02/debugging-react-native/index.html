@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en" prefix="og: http://ogp.me/ns#"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title>Debugging React Native · XWARTZ</title><meta name="description" content="Debugging React Native - xwartz"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/blog/favicon.ico"><link rel="stylesheet" href="//at.alicdn.com/t/font_1472710214_6648843.css"><link rel="stylesheet" href="//raw.githack.com/xwartz/hexo-theme-nuna/next/source/style/main.css?v=1.0.3"></head><body class="pupa"><div class="loading-bar"></div><main><div class="post post"><article itemscope itemtype="http://schema.org/Article" class="hentry"><div class="container"><div class="entry-header"><h1 class="entry-title">Debugging React Native</h1><div class="entry-description"><p>使用 React Native 的一点调试经验</p></div><div class="entry-meta"><time itemprop="datePublished" datetime="Wednesday, February 22nd 2017, 10:11:54 am" class="updated">Feb 22, 2017</time><em class="post-count">1,090 words</em></div></div><div itemprop="articleBody" class="entry-content"><p>React Native 无疑给移动端开发带来效率的提升，我们目前的产品中，iOS 和 Android 代码复用率应该在 80~90%(保守估计)。</p>
+<p>虽然 React Native 提升了开发效率，但在 debug 时还是有很多不爽的地方。</p>
+<p>一些基础的调试方法可以查看官方文档 <a href="https://facebook.github.io/react-native/docs/debugging.html">Debugging</a>。</p>
+<p><a href="https://facebook.github.io/react-native/blog/2016/03/24/introducing-hot-reloading.html">Hot Reloading</a> 应该是我目前最喜欢 RN 的一个地方了吧，和 web 一致的开发体验。</p>
+<p><a href="https://facebook.github.io/react-native/docs/debugging.html#chrome-developer-tools">Debug JS Remotely</a> 也是比较基础的调试方式，可以在 Chrome DevTools 打断点调试。</p>
+<p>不推荐使用 <code>react-native log-ios</code>，调试起来一点都不方便。直接 <code>console.log</code> 在 Chrome DevTools 调试会更方便一些。</p>
+<p>但是 <code>console.log</code> 会使整个程序变卡顿，尤其在 Android 下，界面卡顿无比，所以不建议打印所有信息。</p>
+<p>因此，以下的一些方法主要在于怎么减少在 console 打印信息，而又能方便的调试。</p>
+<h3 id="使用-window-store"><a href="#使用-window-store" class="headerlink" title="使用 window.store"></a>使用 window.store</h3><p><code>console.log</code> 会极大地拖累 JavaScript 线程，所以并不推荐使用 <code>redux-logger</code>。</p>
+<p>要获取 store 的信息，可以用如下方式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (isDebuggingInChrome) &#123;</div><div class="line">  <span class="built_in">window</span>.store = store</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过 <code>store.getState()</code> 的方式打印查看 <code>reducer</code> 的状态。</p>
+<p><img src="https://ww2.sinaimg.cn/large/006tKfTcly1fd7r3rky7dj30oc0hmdho.jpg" alt=""></p>
+<h3 id="在-Chrome-中显示网络请求"><a href="#在-Chrome-中显示网络请求" class="headerlink" title="在 Chrome 中显示网络请求"></a>在 Chrome 中显示网络请求</h3><p>查看 RN 源码 <a href="https://github.com/facebook/react-native/blob/dba133a29194e300e9a2e9e6753f9d4e3a13c194/Libraries/Core/InitializeCore.js#L51">Libraries/Core/InitializeCore.js</a>，注释中写着：</p>
+<blockquote>
+<p>  /**</p>
+<ul>
+<li>Sets an object’s property. If a property with the same name exists, this will</li>
+<li>replace it but maintain its descriptor configuration. By default, the property</li>
+<li>will replaced with a lazy getter.<br>*</li>
+<li>The original property value will be preserved as <code>original[PropertyName]</code> so</li>
+<li>that, if necessary, it can be restored. For example, if you want to route</li>
+<li>network requests through DevTools (to trace them):<br>*</li>
+<li>global.XMLHttpRequest = global.originalXMLHttpRequest;<br>*</li>
+<li>@see <a href="https://github.com/facebook/react-native/issues/934">https://github.com/facebook/react-native/issues/934</a><br>*/</li>
+</ul>
+</blockquote>
+<p>原来的 <code>XMLHttpRequest</code> 被改写成了  <code>originalXMLHttpRequest</code>，</p>
+<p>所以要在 Chrome 中显示 <code>network</code> 只需要替换 <code>XMLHttpRequest</code> 为 <code>originalXMLHttpRequest</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (__DEV__) &#123;</div><div class="line">  GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当然，这样有可能会产生 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS">CORS</a>, Chrome 会限制跨域请求。</p>
+<p>这时要么后端配合一下去除限制，要么使用 <a href="https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi">Allow-Control-Allow-Origin: *</a> 插件。</p>
+<p>这样就可以愉快的调试网络请求了，而不用打印出来，毕竟打印实在是太卡了。</p>
+<p><img src="https://ww3.sinaimg.cn/large/006tKfTcly1fd7rux58ayj31da0myq9y.jpg" alt=""></p>
+<h3 id="react-native-debugger"><a href="#react-native-debugger" class="headerlink" title="react-native-debugger"></a>react-native-debugger</h3><p>无意中看到这个 repo <a href="https://github.com/jhen0409/react-native-debugger#react-native-debugger">react-native-debugger</a>，</p>
+<p><img src="https://ww3.sinaimg.cn/large/006tKfTcgy1fd894emd5jj30x90nhaf5.jpg" alt=""></p>
+<p>使用了 electron，竟然还注入了 React Inspector / Redux DevTools，可以尝试使用。</p>
+<p>不知道效果如何，倒是可以看看源码学习下。</p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>目前 UI 上的调试，并没有找到什么好的方案，所以只能等 RN 团队的推进了。</p>
+<p>希望 RN 早点迎来 1.0.0 release。</p>
+<p>有时间还是要多阅读 RN 源码才好。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://facebook.github.io/react-native/docs/performance">doc performance</a><br><a href="https://facebook.github.io/react-native/docs/debugging">doc debugging</a><br><a href="https://github.com/facebook/react-native">react-native</a></p></div><div class="entry-extra"><div class="entry-tags"><a href="/blog/tags/code/" class="tag">code</a><a href="/blog/tags/react-native/" class="tag">react-native</a></div></div></div></article></div></main><footer><div class="copyright container"><p>© Copyright 2015 - 2018 by <a href="http://github.com/xwartz">xwartz</a>.</p></div></footer><script async src="//cdn.bootcss.com/mathjax/2.7.0-beta.0/MathJax.js"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-69822347-1",'auto');
+ga('set', 'appName',"XWARTZ");
+ga('send','pageview');</script><script>(function () { var sid =500303098;cid =500303108;var hm = document.createElement('script');
+hm.src = 'http://pingjs.qq.com/h5/stats.js';
+hm.setAttribute('name', 'MTAH5'); hm.setAttribute('sid', sid); hm.setAttribute('cid', cid);
+var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s);
+}())</script><script>var _vds = _vds || [];
+window._vds = _vds;
+(function(){
+  ;_vds.push(['setAccountId',"90b580e047dd0007"  ]);
+  (function() {
+      var vds = document.createElement('script');
+      vds.type='text/javascript';
+      vds.async = true;
+      vds.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'dn-growing.qbox.me/vds.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(vds, s);
+  })();
+})();</script><script async src="//raw.githack.com/Easyfood/pageAccelerator/master/dist/page-accelerator.min.js"></script><script async src="/blog/script/loading.js"></script><script async src="/blog/script/photo.js"></script></body></html>

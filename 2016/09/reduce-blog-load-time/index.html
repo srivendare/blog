@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en" prefix="og: http://ogp.me/ns#"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title>又折腾博客了 · XWARTZ</title><meta name="description" content="又折腾博客了 - xwartz"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/blog/favicon.ico"><link rel="stylesheet" href="//at.alicdn.com/t/font_1472710214_6648843.css"><link rel="stylesheet" href="//raw.githack.com/xwartz/hexo-theme-nuna/next/source/style/main.css?v=1.0.3"></head><body class="pupa"><div class="loading-bar"></div><main><div class="post post"><article itemscope itemtype="http://schema.org/Article" class="hentry"><div itemprop="image" style="background-image: url(http://ww1.sinaimg.cn/large/801b780agw1f8auaooidzj21060non4j.jpg)" class="entry-cover"></div><div class="container"><div class="entry-header"><h1 class="entry-title">又折腾博客了</h1><div class="entry-description"><p>我真的是不折腾不会死星人。</p></div><div class="entry-meta"><time itemprop="datePublished" datetime="Thursday, September 29th 2016, 9:33:28 pm" class="updated">Sep 29, 2016</time><em class="post-count">1,216 words</em></div></div><div itemprop="articleBody" class="entry-content"><p>这次一时兴起又买了个域名，<code>xwartz.xyz</code>。每次重新折腾博客，总是换个域名，也好，不用看到以前写的东东。</p>
+<p>当然，博客还是托管在 github pages，访问速度也就只能依靠 github 了。</p>
+<p>不过也是要做点优化的，顺便记录一下，给其他托管在 github pages 的人一些参考吧。</p>
+<h3 id="使用图床"><a href="#使用图床" class="headerlink" title="使用图床"></a>使用图床</h3><p>首先想到的优化点就是图片了，毕竟我的博客都是图片，不做点优化，等加载完花都谢了。</p>
+<p>在做图片优化的时候，顺便打开了下我之前写的个人主页 <a href="http://xwartz.github.com，">http://xwartz.github.com，</a><br>对，又是放在 github pages 上，唉，真是太穷了。</p>
+<p>尼玛，打开真的是巨慢啊，然后看了一下，我去，放了一张 <code>2048 * 1024</code> 的背景图，<br>而且是被 webpack 打包到 react 代码中的，直接整个阻塞掉了。</p>
+<p>对于之前那么多老外打开我的主页，只能说是真爱啊。</p>
+<hr>
+<p>开始着手优化图片加载，嗯，得找个图床，重点是要免费！</p>
+<p>嗯，就是微博了，主要也就是这个上传接口 <a href="http://picupload.service.weibo.com/interface/。">http://picupload.service.weibo.com/interface/。</a></p>
+<p>先别撸起袖子就开始传，这种费力的活肯定有人造好轮子了，so，搜索了下就找到几个 chrome 插件:</p>
+<p><a href="https://chrome.google.com/webstore/detail/%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9A%E5%9B%BE%E5%BA%8A/fdfdnfpdplfbbnemmmoklbfjbhecpnhf?hl=zh-CN">新浪微博图床</a></p>
+<p><a href="https://chrome.google.com/webstore/detail/%E5%9B%B4%E8%84%96%E6%98%AF%E4%B8%AA%E5%A5%BD%E5%9B%BE%E5%BA%8A/pngmcllbdfgmhdgnnpfaciaolgbjplhe?hl=zh-CN">围脖是个好图床</a></p>
+<p><a href="https://github.com/Suxiaogang/WeiboPicBed">WeiboPicBed</a></p>
+<p>试用了下，感觉也不是很方便，所以这里推荐下前同事写的 Mac 版 <a href="https://github.com/toolinbox/iPic">iPic</a>，非常棒的一个软件。</p>
+<p>我就是用 iPic 把博客上的图片全都上传到了新浪微博，速度瞬间提升 N 倍(当然，是我以前没有做优化的原因)。</p>
+<h3 id="github-资源使用-CDN"><a href="#github-资源使用-CDN" class="headerlink" title="github 资源使用 CDN"></a>github 资源使用 CDN</h3><p>其实托管在 github 上的博客，真的没有太多优化的点了，只能再从 js/css 静态资源上入手了。</p>
+<p>我自己写了个博客主题 <a href="https://github.com/xwartz/hexo-theme-nuna">hexo-theme-nuna</a>，然后就想着把 github 上的资源托管到 CDN 上，</p>
+<p>当然又准备找免费的 CDN 服务了，嗯，又被我找到了。。。</p>
+<p><a href="https://rawgit.com/">https://rawgit.com/</a></p>
+<p><a href="https://raw.githack.com/">https://raw.githack.com/</a></p>
+<p><a href="https://gitcdn.xyz/">https://gitcdn.xyz/</a></p>
+<p>以上三个都可以托管 github 资源，区别的话看这里描述 <a href="https://github.com/schme16/gitcdn.xyz#how-is-this-different-from-rawgitcom-and-githackcom">How is this Different from RawGit.com and githack.com</a>。</p>
+<p>gitcdn 是每次会取最新一个 commit 的资源，大概两小时刷新一次资源，其他两个如果是生产环境的话，一年才刷新。。。</p>
+<h3 id="使用-pjax"><a href="#使用-pjax" class="headerlink" title="使用 pjax"></a>使用 pjax</h3><p>做了以上两件事，我的博客访问速度已经算比较快的了，但是作为一个静态博客其实还是可以做些优化的。</p>
+<p>为了省去博客的 <code>reload</code>，使用了 <a href="https://github.com/Easyfood/pageAccelerator">pageAccelerator</a> 这个库。</p>
+<p>原理也就是 <code>pjax</code>，在第一次加载之后，所有本站的链接点击，都会发起一个 <code>ajax</code> 请求，<br>然后将 <code>head</code> 做一个 <code>merge</code>，<code>body</code> 直接替换。</p>
+<p>使用 <code>pushState</code> 更新浏览器访问记录，监听 <code>popstate</code> 事件，做前进/后退的活。</p>
+<p>也没有特意做什么兼容，所以博客的浏览器支持 <code>IE10+</code> ，还有主题用了 <code>flex</code>，<br>本就没有想要兼容老的浏览器，毕竟也没什么人访问我的博客。</p>
+<h3 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h3><p>通过以上几点的优化，博客的访问速度还算不错，当第一次打开博客之后，访问其他页面，基本上就是秒开了，体验非常棒。</p>
+<p>可能后续还会做点优化，比如把国内的托管到 coding.net，海外的才指向 github 。</p>
+<p>最后，放个福利 <a href="https://itunes.apple.com/us/app/automute-preventing-awkward/id1118136179?mt=12">AutoMute</a>，上班时间喜欢戴耳机的朋友应该会喜欢。</p></div><div class="entry-extra"><div class="entry-tags"><a href="/blog/tags/blog/" class="tag">blog</a></div></div></div></article></div></main><footer><div class="copyright container"><p>© Copyright 2015 - 2018 by <a href="http://github.com/xwartz">xwartz</a>.</p></div></footer><script async src="//cdn.bootcss.com/mathjax/2.7.0-beta.0/MathJax.js"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-69822347-1",'auto');
+ga('set', 'appName',"XWARTZ");
+ga('send','pageview');</script><script>(function () { var sid =500303098;cid =500303108;var hm = document.createElement('script');
+hm.src = 'http://pingjs.qq.com/h5/stats.js';
+hm.setAttribute('name', 'MTAH5'); hm.setAttribute('sid', sid); hm.setAttribute('cid', cid);
+var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s);
+}())</script><script>var _vds = _vds || [];
+window._vds = _vds;
+(function(){
+  ;_vds.push(['setAccountId',"90b580e047dd0007"  ]);
+  (function() {
+      var vds = document.createElement('script');
+      vds.type='text/javascript';
+      vds.async = true;
+      vds.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'dn-growing.qbox.me/vds.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(vds, s);
+  })();
+})();</script><script async src="//raw.githack.com/Easyfood/pageAccelerator/master/dist/page-accelerator.min.js"></script><script async src="/blog/script/loading.js"></script><script async src="/blog/script/photo.js"></script></body></html>
